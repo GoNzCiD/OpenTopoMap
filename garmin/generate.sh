@@ -1,30 +1,12 @@
-# Changes from original
-* Remove map metadata to old/low performance devices
-  * Try to maintain/optimize to MTB routing
-  * Remove non interesting POI
-  * Simplify the polygons 
-* Translate styles to Spanish
+#! /bin/bash
 
-# Building a custom Garmin map - a complete walkthrough
+# Quick script from readme texts, remember to check inside tools folder for original script
+# Basic ussage of mkgmap from its documentation
 
-Based on the [HOWTO](HOWTO) this guide describes how to create a custom Garmin map.
-using OpenTopoMap styles.
+MKGMAP="mkgmap-r4600" # adjust to latest version (see www.mkgmap.org.uk)
+SPLITTER="splitter-r598"
 
-## Required tools & OpenTopoMap repository
-
-```bash
-git clone https://github.com/der-stefan/OpenTopoMap.git
-cd OpenTopoMap/garmin
-```
-
-Download [mkgmap](http://www.mkgmap.org.uk/download/mkgmap.html),
-[splitter](http://www.mkgmap.org.uk/download/splitter.html) & bounds
-
-```bash
-MKGMAP="mkgmap-r4136" # adjust to latest version (see www.mkgmap.org.uk)
-SPLITTER="splitter-r591"
-
-mkdir tools
+mkdir -p tools
 pushd tools > /dev/null
 
 if [ ! -d "${MKGMAP}" ]; then
@@ -46,7 +28,7 @@ if stat --printf='' bounds/bounds_*.bnd 2> /dev/null; then
 else
     echo "downloading bounds"
     rm -f bounds.zip  # just in case
-    wget "http://osm2.pleiades.uni-wuppertal.de/bounds/latest/bounds.zip"
+    wget -O bounds.zip "http://osm.thkukuk.de/data/bounds-latest.zip"
     unzip "bounds.zip" -d bounds
 fi
 
@@ -57,24 +39,24 @@ if stat --printf='' sea/sea_*.pbf 2> /dev/null; then
 else
     echo "downloading sea"
     rm -f sea.zip  # just in case
-    wget "http://osm2.pleiades.uni-wuppertal.de/sea/latest/sea.zip"
+    wget -O sea.zip "http://osm.thkukuk.de/data/sea-latest.zip"
     unzip "sea.zip" -d sea
 fi
 
 SEA="$(pwd)/sea"
-```
 
-## Fetch map data, split & build garmin map
-
-```bash
 mkdir data
 pushd data > /dev/null
 
-rm -f morocco-latest.osm.pbf
-wget "https://download.geofabrik.de/africa/morocco-latest.osm.pbf"
+#COUNTRY="andorra"
+COUNTRY="spain"
+MAP="$COUNTRY-latest.osm.pbf"
+# TODO: Check if exists one file with x days old
+rm -f $MAP
+wget "https://download.geofabrik.de/europe/$MAP"
 
 rm -f 6324*.pbf
-java -jar $SPLITTERJAR --precomp-sea=$SEA "$(pwd)/morocco-latest.osm.pbf"
+java -jar $SPLITTERJAR --precomp-sea=$SEA "$(pwd)/$MAP"
 DATA="$(pwd)/6324*.pbf"
 
 popd > /dev/null
@@ -85,15 +67,21 @@ STYLEFILE="$(pwd)/style/opentopomap"
 pushd style/typ > /dev/null
 
 java -jar $MKGMAPJAR --family-id=35 OpenTopoMap.txt
-TYPFILE="$(pwd)/OpenTopoMap.typ"
+TYPFILE="$(pwd)/opentopomap.typ"
 
 popd > /dev/null
 
+NAMELIST="name:es,name:es,int_name,name"
+
+SUFFIX='lite'
+
 java -jar $MKGMAPJAR -c $OPTIONS --style-file=$STYLEFILE \
     --precomp-sea=$SEA \
+    --name-tag-list=${NAMELIST} \
+	--description="GnZ ${COUNTRY} ${SUFFIX}" \
+	--family-name="GnZ ${COUNTRY} ${SUFFIX} `date "+%Y-%m-%d"`" \
+	--series-name="GnZ ${COUNTRY} ${SUFFIX} `date "+%Y-%m-%d"`" \
     --output-dir=output --bounds=$BOUNDS $DATA $TYPFILE
 
 # optional: give map a useful name:
-mv output/gmapsupp.img output/morocco.img
-
-```
+mv output/gmapsupp.img output/GnZ_${COUNTRY}_${SUFFIX}.img

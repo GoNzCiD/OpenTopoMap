@@ -1,1 +1,4 @@
 mapnik/tools/saddledirection
+.history/*
+garmin/third_party/bounds.zip
+garmin/third_party/sea.zip

@@ -14,7 +14,22 @@ leisure=* & sport=* & name!=* { add name='${sport}' }
 include 'inc/name';
 
 # buildings tag should be FIRST
-building=* & area!=no [0x13 resolution 24 continue]
+##building=* & area!=no [0x13 resolution 24 continue]
+
+######################################################
+## TODO: this is working / Clean these line with final
+## Esta forma si funciona
+#(building=farm | building=hotel | building=commercial | building=industrial | building=retail | building=supermarket | building=kiosk | building=cathedral | building=chapel | building=monastery | building=church | building=religious | building=shrine | building=synagogue | building=temple | building=bakehouse | building=civic | building=fire_station | building=goverment | building=hospital | building=public | building=toilets | building=train_station | building=transportation | building=kindergarten | building=school | building=university | building=college) & area!=no [0x13 resolution 24 continue]
+
+
+#((building!=apartments | building!=detached | building!=dormitory | building!=house | building!=residential | building!=semidetached_house | building!=terrace) & area!=no) [0x13 resolution 24 continue]
+#building!=apartments & area!=no [0x13 resolution 24 continue]
+
+
+building=* & area!=no & (leisure=* | sport=* | amenity=* | source=*) [0x13 resolution 24 continue]
+######################################################
+
+
 
 aeroway=airport [0x07 resolution 20]
 aeroway=aerodrome [0x07 resolution 20]

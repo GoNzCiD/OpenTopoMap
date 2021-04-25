@@ -1,3 +1,6 @@
+# Changes from original
+* Try to generate maps for low performance garmin devices
+
 OpenTopoMap
 ===========
 OpenTopoMap is a topographic map out of data from OpenStreetMap and SRTM. If you are interested in building your own OpenTopoMap, see the beginner's guides for [a tile server](mapnik/README.md) and for [Garmin files](garmin/README.md).
